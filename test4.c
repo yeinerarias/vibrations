@@ -13,7 +13,6 @@ static long double acc_h1,acc_h2, acc_h3, acc_h4, acc_h5=0;
 int end_h1,end_h2,end_h3,end_h4,end_h5;
 
 
-//cochinadas de Yeier
 
 int porcentajehilo1 = 1, porcentajehilo2 = 2, porcentajehilo3 = 4, porcentajehilo4 = 6, porcentajehilo5 = 11;
 int porcentajehilo1actual = 0, porcentajehilo2actual = 0, porcentajehilo3actual = 0, porcentajehilo4actual = 0, porcentajehilo5actual = 0;

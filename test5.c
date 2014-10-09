@@ -13,7 +13,7 @@ static void scheduler(int signum);
 int h1,h2,h3,h4,h5=0;
 static long double acc_h1,acc_h2, acc_h3, acc_h4, acc_h5=0;
 int end_h1,end_h2,end_h3,end_h4,end_h5;
-int r=-1;
+static int r=-1;
 
 
 int porcentajehilo1 = 1, porcentajehilo2 = 2, porcentajehilo3 = 4, porcentajehilo4 = 6, porcentajehilo5 = 11;
@@ -23,6 +23,27 @@ int porcentajehilo1actual = 0, porcentajehilo2actual = 0, porcentajehilo3actual 
 int end_hilo1 = 0, end_hilo2 = 0, end_hilo3 = 0, end_hilo4 = 0, end_hilo5 = 0;
 
 static void scheduler(int signum){ 
+	if (r != -1){
+	printf("Aqui guardo el ambiente : %d \n",1+r);
+	if(sigsetjmp(env_struct[r],1)==0){
+		    printf("no vengo de un salto, pi es %Le \n",(1+acc_h1)*2.0);
+		    printf("no vengo de un salto, pi__2 es %Le \n",(1+acc_h2)*2.0);
+		    r=rand() % 2;
+		    printf(" va el hilo %d \n", 1+ r);
+		    siglongjmp(env_struct[r],1);
+		   
+	}
+	else{
+	   printf("vengo de un salto de: %d \n" ,1+r);
+            
+	   }
+	}
+	else{
+	r=rand() % 2;
+	printf(" va el hilo %d \n",1+ r);
+	siglongjmp(env_struct[r],1);}
+	/*
+	
 		int i;
 		
 			system("clear");
@@ -109,8 +130,6 @@ static void _scheduler(){
 }
 */
 void hilo1(){
-printf("entre miher\n");
-
 end_h1=0;
 static int  i=0;
 static float j=0;
@@ -118,8 +137,8 @@ static long double acc=1.0;
  acc_h1=0.0;
 
 if (end_h1==0){
+	printf("soy hilo 1\n");
 	for(i=1;i<n_1+1;i++){
-		sigsetjmp(env_1,1);
 		acc=1.0;
 		for (j=2*i;j>i;j--){
 			acc*=j/(4*(j-i));
@@ -131,46 +150,32 @@ if (end_h1==0){
 	 
 	  end_h1=1;
 	  
-	}        
+	}    
   } 
      
 void hilo2(){
-sigsetjmp(env_2,1);
-if (h2 ==0) {
-}
-else{
-
-static int end=0;
+end_h2=0;
 static int  i=0;
 static float j=0;
 static long double acc=1.0;
  acc_h2=0.0;
-while(1){
 
-
-       int returned_from_longjump=1;
-	 
-		if ((returned_from_longjump = sigsetjmp(env_2,1)) ==0){
-	  		siglongjmp(env_sc,1);}
-	  		if (end==0){
-			for(i=1;i<n_2+1;i++){
-				sigsetjmp(env_2,1);
-				acc=1.0;
-				for (j=2*i;j>i;j--){
-					acc*=j/(4*(j-i));
-					}
-				porcentajehilo2actual = i*57/n_2;
-				acc=acc/(2*i+1);
-				acc_h2=acc_h2+acc;
-				}
-			 
-			  end_h2=1;
-			  
+if (end_h2==0){
+	printf("soy hilo 2\n");
+	for(i=1;i<n_2+1;i++){
+		acc=1.0;
+		for (j=2*i;j>i;j--){
+			acc*=j/(4*(j-i));
 			}
-  
-	    }
-      }
-         
+		porcentajehilo2actual = i*57/n_2;
+		acc=acc/(2*i+1);
+		acc_h2=acc_h2+acc;
+		}
+ 
+	end_h2=1;
+}
+ 
+        
   } 
 
 void hilo3(){
@@ -473,14 +478,22 @@ void crearhilo5(){
 }
 
 void crear_hilos(){
-	if ( sigsetjmp(env_struct[0],1)) 	{
+
+	if ( sigsetjmp(env_struct[0],1)!=0 )	{
 	hilo1();
+	printf ("chao mundo_1");
 	return;
 	}
-	/*if ( sigsetjmp(env_struct[01)) 	{
+	
+	if (sigsetjmp(env_struct[1],1)!=0) 	{
+	printf("hola mundo_2 \n");
 	hilo2();
-	return;}*/
+	printf ("chao mundo_2 \n");
+	return;}
+
 }
+
+
 int main() {
 	
 	srand(time(NULL));
@@ -526,36 +539,36 @@ int main() {
 	printf("Unidades de Trabajo para el Hilo 5\n");
 	scanf("%d",&n_5);
 	n_5 *= 50;	
-	
+
 	if (modo) {
-	    crear_hilos();
-	
+	   
 		/*
 		h1=crear_hilo(0);
 		h2=crear_hilo(1);
 		h3=crear_hilo(2);
 		h4=crear_hilo(3);
 		h5=crear_hilo(4);*/
-		
+		/*
 		struct sigaction sa;
 		struct itimerval timer;
-		
-		
-		/* Install timer_handler as the signal handler for SIGALRM. */
+	
 		memset (&sa, 0, sizeof (sa));
 		sa.sa_handler = &scheduler;
 		sigaction (SIGALRM, &sa, NULL);
 
-		/* Configure the timer to expire after 250 msec... */
 		timer.it_value.tv_sec = 0;
 		timer.it_value.tv_usec = quantum;
-		/* ... and every 250 msec after that. */
+		/* ... and every 250 msec after that. 
 		timer.it_interval.tv_sec = 0;
 		timer.it_interval.tv_usec = quantum;
 		/* Start a real timer. It counts down whenever this process is
-		executing. */
-		setitimer (ITIMER_REAL, &timer, NULL);
+		executing. 
+		setitimer (ITIMER_REAL, &timer, NULL);*/
 		//scheduler(0);
+		
+		 crear_hilos();
+		 siglongjmp (env_struct[1],1);
+		
 	}
 	else {
 		crearhilo1();
@@ -567,7 +580,7 @@ int main() {
 	}
 	
 while(1);
-	return 1;
+return 1;
 }
 
 
